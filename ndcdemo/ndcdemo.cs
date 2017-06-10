@@ -1,5 +1,6 @@
 ﻿using System;
-
+using NdcDemo.Services;
+using NdcDemo.Services.Dtos;
 using Xamarin.Forms;
 
 namespace ndcdemo
@@ -8,6 +9,9 @@ namespace ndcdemo
 	{
 		public App()
 		{
+			var testButton = new Button { Text = "Test database" };
+			testButton.Clicked += (sender, e) => TestFirebase();
+
 			// The root page of your application
 			var content = new ContentPage {
 				Title = "ndcdemo",
@@ -17,7 +21,8 @@ namespace ndcdemo
 						new Label {
 							HorizontalTextAlignment = TextAlignment.Center,
 							Text = "Welcome to Xamarin Forms!"
-						}
+						},
+						testButton
 					}
 				}
 			};
@@ -38,6 +43,12 @@ namespace ndcdemo
 		protected override void OnResume()
 		{
 			// Handle when your app resumes
+		}
+
+		void TestFirebase()
+		{
+			var dataService = ServiceContainer.DataService;
+			dataService.PostMessage(new Message { Name="Test", Text="Hello from Xamarin", Date=DateTime.Now });
 		}
 	}
 }
