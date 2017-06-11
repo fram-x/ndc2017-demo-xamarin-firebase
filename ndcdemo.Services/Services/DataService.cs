@@ -44,6 +44,11 @@ namespace NdcDemo.Services
 			return provider;
 		}
 
+		public void CancelObservation(IObservableHandle observableHandle)
+		{
+			(observableHandle as IObservable)?.CancelObservation();
+		}
+
 		#endregion
 	}
 }

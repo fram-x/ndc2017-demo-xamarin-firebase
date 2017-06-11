@@ -12,54 +12,56 @@ namespace ndcdemo
 {
 	public class App : Application
 	{
-		ObservableCollection<Message> Messages;
+		readonly ObservableCollection<Message> _messages;
+
+		Entry _nameInput;
+		Entry _textInput;
 
 		public App()
 		{	
-			Messages = new ObservableCollection<Message>();
+			_messages = new ObservableCollection<Message>();
+
 			MainPage = new NavigationPage(BuildMainPage());
-			LoadMessagesAndObserveAdditions();
-		}
-
-		protected override void OnStart()
-		{
-			// Handle when your app starts
-		}
-
-		protected override void OnSleep()
-		{
-			// Handle when your app sleeps
-		}
-
-		protected override void OnResume()
-		{
-			// Handle when your app resumes
+			ObserveMessages();
 		}
 
 		ContentPage BuildMainPage() 
 		{
-			var testButton = new Button { Text = "Test database" };
-			testButton.Clicked += (sender, e) => TestFirebase();
-
 			var messageCell = new DataTemplate(typeof(TextCell));
 			messageCell.SetBinding(TextCell.TextProperty, nameof(Message.Text));
 			messageCell.SetBinding(TextCell.DetailProperty, nameof(Message.Name));
 
 			var messageView = new ListView { ItemTemplate = messageCell };
-			messageView.ItemsSource = Messages;
+			messageView.ItemsSource = _messages;
 
-			// The root page of your application
+			_nameInput = new Entry { WidthRequest=200 };
+			_textInput = new Entry { WidthRequest=200 };
+			                     
+			var postButton = new Button { Text = "Post" };
+			postButton.Clicked += (sender, e) => PostNewMessage();
+
 			var content = new ContentPage {
 				Title = "ndcdemo",
 				Content = new StackLayout {
-					VerticalOptions = LayoutOptions.Fill,
 					Children = {
 						messageView,
-						new Label {
-							HorizontalTextAlignment = TextAlignment.Center,
-							Text = "Welcome to Xamarin Forms!"
+						new StackLayout {
+							Orientation = StackOrientation.Horizontal,
+							Margin= new Thickness(15,5), 
+							Children = {
+								new Label { Text = "Name", WidthRequest=50 },
+								_nameInput
+							}
 						},
-						testButton
+						new StackLayout {
+							Orientation = StackOrientation.Horizontal,
+							Margin= new Thickness(15,5), 
+							Children = {
+								new Label { Text = "Text", WidthRequest=50},
+								_textInput
+							}
+						},
+						postButton
 					}
 				}
 			};
@@ -67,46 +69,48 @@ namespace ndcdemo
 			return content;
 		}
 
-		void LoadMessagesAndObserveAdditions()
+		void ObserveMessages()
 		{
 			var dataService = ServiceContainer.DataService;
 			dataService.ObserveMessages((obsType, msg) => {
 				if (obsType == ObservationType.ChildAdded) {
 					AddMessage(msg);
-				}
+				} 
+				else if (obsType == ObservationType.ChildRemoved) {
+					DeleteMessage(msg);
+				} 
 			});
-
-			//Task.Run(async () => {
-			//	var dataService = ServiceContainer.DataService;
-			//	var messages = await dataService.GetMessagesAsync();
-
-			//	foreach (var m in messages.OrderByDescending(m => m.Date)) {
-			//		Messages.Add(m);
-			//	}
-
-			//	dataService.ObserveMessages();
-			//});
 		}
 
 		void AddMessage(Message msg)
 		{
-			var msgAfter = Messages
+			var msgAfter = _messages
 				.Where(m => m.Date < msg.Date)
 				.FirstOrDefault();
 
 			if (msgAfter == null) {
-				Messages.Add(msg);
+				_messages.Add(msg);
 			}
 			else {
-				var idx = Messages.IndexOf(msgAfter);
-				Messages.Insert(idx, msg);
+				var idx = _messages.IndexOf(msgAfter);
+				_messages.Insert(idx, msg);
 			}
 		}
 
-		void TestFirebase()
+		void DeleteMessage(Message msg)
 		{
+			var msgToDelete = _messages.FirstOrDefault(m => m.Id == msg.Id);
+			if (msgToDelete != null) {
+				_messages.Remove(msgToDelete);
+			}
+		}
+
+		void PostNewMessage()
+		{
+			if (string.IsNullOrWhiteSpace(_nameInput.Text) || string.IsNullOrWhiteSpace(_textInput.Text)) return;
+			
 			var dataService = ServiceContainer.DataService;
-			dataService.PostMessage(new Message { Name="Test", Text="Hello from Xamarin", Date=DateTime.Now });
+			dataService.PostMessage(new Message { Name=_nameInput.Text, Text=_textInput.Text, Date=DateTime.Now });
 		}
 	}
 }
