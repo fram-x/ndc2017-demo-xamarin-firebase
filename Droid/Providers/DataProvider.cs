@@ -15,28 +15,28 @@ namespace NdcDemo.Droid
 		Unordered
 	}
 
-	/// <summary>
-	/// Generic listener for custom handling of value events
-	/// </summary>
-	internal class ValueEventListener : Java.Lang.Object, IValueEventListener
-	{
-		readonly Action<DataSnapshot> _handleValue;
+	///// <summary>
+	///// Generic listener for custom handling of value events
+	///// </summary>
+	//internal class ValueEventListener : Java.Lang.Object, IValueEventListener
+	//{
+	//	readonly Action<DataSnapshot> _handleValue;
 
-		public ValueEventListener(Action<DataSnapshot> handleValue)
-		{
-			_handleValue = handleValue;
-		}
+	//	public ValueEventListener(Action<DataSnapshot> handleValue)
+	//	{
+	//		_handleValue = handleValue;
+	//	}
 
-		public void OnCancelled(DatabaseError error)
-		{
-			throw new NotImplementedException();
-		}
+	//	public void OnCancelled(DatabaseError error)
+	//	{
+	//		throw new NotImplementedException();
+	//	}
 
-		public void OnDataChange(DataSnapshot snapshot)
-		{
-			_handleValue(snapshot);
-		}
-	}
+	//	public void OnDataChange(DataSnapshot snapshot)
+	//	{
+	//		_handleValue(snapshot);
+	//	}
+	//}
 
 	/// <summary>
 	/// Single value "event listene"r to be used when single object or null is expected from a query
@@ -111,88 +111,88 @@ namespace NdcDemo.Droid
 		}
 	}
 
-	/// <summary>
-	/// First value "event listener" to be used when a set of objects are expected from a query, but only the first is to be used
-	/// </summary>
-	internal class FirstValueEventListener<T> : Java.Lang.Object, IValueEventListener where T : Identifiable, new()
-	{
-		#region Private members
+	///// <summary>
+	///// First value "event listener" to be used when a set of objects are expected from a query, but only the first is to be used
+	///// </summary>
+	//internal class FirstValueEventListener<T> : Java.Lang.Object, IValueEventListener where T : Identifiable, new()
+	//{
+	//	#region Private members
 
-		readonly TaskCompletionSource<T> _completionSource;
+	//	readonly TaskCompletionSource<T> _completionSource;
 
-		#endregion
+	//	#endregion
 
-		/// <summary>
-		/// Constructs listener to set result on given completion source.
-		/// </summary>
-		/// <param name="completionSource">Completion source.</param>
-		public FirstValueEventListener(TaskCompletionSource<T> completionSource)
-		{
-			_completionSource = completionSource;
-		}
+	//	/// <summary>
+	//	/// Constructs listener to set result on given completion source.
+	//	/// </summary>
+	//	/// <param name="completionSource">Completion source.</param>
+	//	public FirstValueEventListener(TaskCompletionSource<T> completionSource)
+	//	{
+	//		_completionSource = completionSource;
+	//	}
 
-		public void OnCancelled(DatabaseError error)
-		{
-			// TODO: Handle
-			throw new NotImplementedException();
-		}
+	//	public void OnCancelled(DatabaseError error)
+	//	{
+	//		// TODO: Handle
+	//		throw new NotImplementedException();
+	//	}
 
-		public void OnDataChange(DataSnapshot snapshot)
-		{
-			var result = Encoder.DecodeList<T>(snapshot.Value);
-			var obj = result?.Values.ToList().FirstOrDefault() ?? null;
+	//	public void OnDataChange(DataSnapshot snapshot)
+	//	{
+	//		var result = Encoder.DecodeList<T>(snapshot.Value);
+	//		var obj = result?.Values.ToList().FirstOrDefault() ?? null;
 
-			_completionSource.TrySetResult(obj);
-		}
-	}
+	//		_completionSource.TrySetResult(obj);
+	//	}
+	//}
 
-	/// <summary>
-	/// First value "event listener" to be used when a set of objects are expected from a query, but only the first is to be used
-	/// </summary>
-	internal class AllWithValueEventListener<T> : Java.Lang.Object, IValueEventListener where T : Identifiable, new()
-	{
-		#region Private members
+	///// <summary>
+	///// First value "event listener" to be used when a set of objects are expected from a query, but only the first is to be used
+	///// </summary>
+	//internal class AllWithValueEventListener<T> : Java.Lang.Object, IValueEventListener where T : Identifiable, new()
+	//{
+	//	#region Private members
 
-		readonly string _childValue;
-		readonly string _childKey;
-		readonly TaskCompletionSource<IEnumerable<T>> _completionSource;
+	//	readonly string _childValue;
+	//	readonly string _childKey;
+	//	readonly TaskCompletionSource<IEnumerable<T>> _completionSource;
 
-		#endregion
+	//	#endregion
 
-		/// <summary>
-		/// Constructs listener to set result on given completion source.
-		/// </summary>
-		/// <param name="completionSource">Completion source.</param>
-		public AllWithValueEventListener(string childKey, string childValue, TaskCompletionSource<IEnumerable<T>> completionSource)
-		{
-			_childKey = childKey;
-			_childValue = childValue;
-			_completionSource = completionSource;
-		}
+	//	/// <summary>
+	//	/// Constructs listener to set result on given completion source.
+	//	/// </summary>
+	//	/// <param name="completionSource">Completion source.</param>
+	//	public AllWithValueEventListener(string childKey, string childValue, TaskCompletionSource<IEnumerable<T>> completionSource)
+	//	{
+	//		_childKey = childKey;
+	//		_childValue = childValue;
+	//		_completionSource = completionSource;
+	//	}
 
-		public void OnCancelled(DatabaseError error)
-		{
-			// TODO: Handle
-			throw new NotImplementedException();
-		}
+	//	public void OnCancelled(DatabaseError error)
+	//	{
+	//		// TODO: Handle
+	//		throw new NotImplementedException();
+	//	}
 
-		public void OnDataChange(DataSnapshot snapshot)
-		{
-			var result = Encoder.DecodeList<T>(snapshot.Value);
-			var list = result?.Values.ToList();
+	//	public void OnDataChange(DataSnapshot snapshot)
+	//	{
+	//		var result = Encoder.DecodeList<T>(snapshot.Value);
+	//		var list = result?.Values.ToList();
 
-			var propInfo = typeof(T).GetProperty(_childKey);
-			if (propInfo == null) {
-				throw new InvalidOperationException($"{typeof(T).Name} doesn't have property {_childKey}");
-			}
+	//		var propInfo = typeof(T).GetProperty(_childKey);
+	//		if (propInfo == null) {
+	//			throw new InvalidOperationException($"{typeof(T).Name} doesn't have property {_childKey}");
+	//		}
 
-			var filteredList = list
-				.Where(o => propInfo.GetValue(o).ToString().Equals(_childValue))
-				.ToList();
+	//		var filteredList = list
+	//			.Where(o => propInfo.GetValue(o).ToString().Equals(_childValue))
+	//			.ToList();
 
-			_completionSource.TrySetResult(filteredList);
-		}
-	}
+	//		_completionSource.TrySetResult(filteredList);
+	//	}
+	//}
 
 	/// <summary>
 	/// Observes changes to child objects of a node. Handler will be called on add, change, move and remove of child objects
@@ -286,6 +286,12 @@ namespace NdcDemo.Droid
 
 		}
 
+		public void Delete(string id)
+		{
+			var objNode = _dbGroupNode.Child(id);
+			objNode.RemoveValue();
+		}
+
 		public Task<T> ReadAsync(string id)
 		{
 			var t = new TaskCompletionSource<T>();
@@ -302,72 +308,6 @@ namespace NdcDemo.Droid
 			_dbGroupNode.AddListenerForSingleValueEvent(new MultiValueEventListener<T>(t));
 
 			return t.Task;
-		}
-
-		public Task<T> ReadFirstFromChildValueAsync(string childKey, string childValue)
-		{
-			var t = new TaskCompletionSource<T>();
-
-			// Search from childValue and pick first 
-			_dbGroupNode
-				.OrderByChild(childKey)
-				.EqualTo(childValue)
-				.LimitToFirst(1)
-				.AddListenerForSingleValueEvent(new FirstValueEventListener<T>(t));
-
-			return t.Task;
-		}
-
-		public Task<IEnumerable<T>> ReadAllWithChildValueAsync(string childKey, string childValue)
-		{
-			var t = new TaskCompletionSource<IEnumerable<T>>();
-
-			// Search from childValue and pick first 
-			_dbGroupNode
-				.OrderByChild(childKey)
-				.EqualTo(childValue)
-				.AddListenerForSingleValueEvent(new AllWithValueEventListener<T>(childKey, childValue, t));
-
-			return t.Task;
-		}
-
-		public Task<IEnumerable<T>> ReadPageFromNewestAsync(int pageSize, string lastIdOnPrecedingPage)
-		{
-			var t = new TaskCompletionSource<IEnumerable<T>>();
-
-			var query = _dbGroupNode.OrderByKey();
-			var includesPreceding = !string.IsNullOrEmpty(lastIdOnPrecedingPage);
-
-			if (includesPreceding)
-			{
-				query = query.EndAt(lastIdOnPrecedingPage);
-				pageSize++;
-			}
-
-			query.LimitToLast(pageSize)
-			     .AddListenerForSingleValueEvent(new MultiValueEventListener<T>(t, order: Order.Descending, excludeIds: lastIdOnPrecedingPage));
-
-			return t.Task;
-		}
-
-		public Task<bool> ExistsAsync(string id)
-		{
-			var t = new TaskCompletionSource<bool>();
-
-			_dbGroupNode
-				.Child(id)
-				.AddValueEventListener(new ValueEventListener((DataSnapshot snapshot) => 
-				{
-					t.TrySetResult(snapshot.Exists());	
-				}));
-
-			return t.Task;
-		}
-
-		public void Delete(string id)
-		{
-			var objNode = _dbGroupNode.Child(id);
-			objNode.RemoveValue();
 		}
 
 		#endregion
