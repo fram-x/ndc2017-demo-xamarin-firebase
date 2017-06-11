@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "693808168410",
+    "firebase_url": "https://ndc2017demo.firebaseio.com",
+    "project_id": "ndc2017demo",
+    "storage_bucket": "ndc2017demo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:693808168410:android:a891401651eb4189",
+        "android_client_info": {
+          "package_name": "no.framx.ndcdemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "693808168410-e47q96qs9n63bknojptp2bbbpc4rm6ft.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBeyVuN9X4E8WboyhfYKS3Pd9GGd8XAieY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

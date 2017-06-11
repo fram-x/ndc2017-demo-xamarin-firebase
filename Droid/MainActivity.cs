@@ -7,6 +7,8 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.OS;
+using NdcDemo.Services;
+using NdcDemo.Droid;
 
 namespace ndcdemo.Droid
 {
@@ -21,6 +23,13 @@ namespace ndcdemo.Droid
 			base.OnCreate(bundle);
 
 			global::Xamarin.Forms.Forms.Init(this, bundle);
+			Firebase.FirebaseApp.InitializeApp(this);
+
+			ILogger logger = new Logger();
+			logger.Debug("Started");
+			ServiceContainer.Logger = logger;
+			ServiceContainer.DataProviderFactory = new DataProviderFactory();
+			ServiceContainer.DataService = new DataService(ServiceContainer.DataProviderFactory, ServiceContainer.Logger);
 
 			LoadApplication(new App());
 		}
