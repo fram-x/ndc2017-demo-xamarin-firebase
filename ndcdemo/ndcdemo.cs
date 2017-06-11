@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NdcDemo.Services;
 using NdcDemo.Services.Dtos;
 using Xamarin.Forms;
@@ -18,14 +16,14 @@ namespace ndcdemo
 		Entry _textInput;
 
 		public App()
-		{	
+		{
 			_messages = new ObservableCollection<Message>();
 
 			MainPage = new NavigationPage(BuildMainPage());
 			ObserveMessages();
 		}
 
-		ContentPage BuildMainPage() 
+		ContentPage BuildMainPage()
 		{
 			var messageCell = new DataTemplate(typeof(TextCell));
 			messageCell.SetBinding(TextCell.TextProperty, nameof(Message.Text));
@@ -34,9 +32,9 @@ namespace ndcdemo
 			var messageView = new ListView { ItemTemplate = messageCell };
 			messageView.ItemsSource = _messages;
 
-			_nameInput = new Entry { WidthRequest=200 };
-			_textInput = new Entry { WidthRequest=200 };
-			                     
+			_nameInput = new Entry { WidthRequest = 200 };
+			_textInput = new Entry { WidthRequest = 200 };
+
 			var postButton = new Button { Text = "Post" };
 			postButton.Clicked += (sender, e) => PostNewMessage();
 
@@ -47,7 +45,7 @@ namespace ndcdemo
 						messageView,
 						new StackLayout {
 							Orientation = StackOrientation.Horizontal,
-							Margin= new Thickness(15,5), 
+							Margin= new Thickness(15,5),
 							Children = {
 								new Label { Text = "Name", WidthRequest=50 },
 								_nameInput
@@ -55,7 +53,7 @@ namespace ndcdemo
 						},
 						new StackLayout {
 							Orientation = StackOrientation.Horizontal,
-							Margin= new Thickness(15,5), 
+							Margin= new Thickness(15,5),
 							Children = {
 								new Label { Text = "Text", WidthRequest=50},
 								_textInput
@@ -75,10 +73,10 @@ namespace ndcdemo
 			dataService.ObserveMessages((obsType, msg) => {
 				if (obsType == ObservationType.ChildAdded) {
 					AddMessage(msg);
-				} 
+				}
 				else if (obsType == ObservationType.ChildRemoved) {
 					DeleteMessage(msg);
-				} 
+				}
 			});
 		}
 
@@ -108,9 +106,9 @@ namespace ndcdemo
 		void PostNewMessage()
 		{
 			if (string.IsNullOrWhiteSpace(_nameInput.Text) || string.IsNullOrWhiteSpace(_textInput.Text)) return;
-			
+
 			var dataService = ServiceContainer.DataService;
-			dataService.PostMessage(new Message { Name=_nameInput.Text, Text=_textInput.Text, Date=DateTime.Now });
+			dataService.PostMessage(new Message { Name = _nameInput.Text, Text = _textInput.Text, Date = DateTime.Now });
 		}
 	}
 }

@@ -98,123 +98,6 @@ namespace Firebase.iOS.Providers
 			return t.Task;
 		}
 
-		public Task<T> ReadFirstFromChildValueAsync(string childKey, string childValue)
-		{
-			var t = new TaskCompletionSource<T>();
-
-			// Search from childValue and pick first 
-			_dbGroupNode
-				.GetQueryOrderedByChild(childKey)
-				.GetQueryEqualToValue(new NSString(childValue))
-				//.GetQueryStartingAtValue(new NSString(childValue)) 
-				.GetQueryLimitedToFirst(1)
-				.ObserveSingleEvent(DataEventType.Value, (snapshot) =>
-				{
-					var nsObject = snapshot.ValueInExportFormat;
-					var nsDictionary = nsObject as NSDictionary;
-
-					if (nsDictionary == null)
-					{
-						t.TrySetResult(null);
-					}
-					else
-					{
-						var obj = Encoder.DecodeObject<Dictionary<string, T>>(nsDictionary);
-						t.TrySetResult(obj.Values.FirstOrDefault());
-					}
-				});
-
-			return t.Task;
-		}
-
-		public Task<IEnumerable<T>> ReadAllWithChildValueAsync(string childKey, string childValue)
-		{
-			var t = new TaskCompletionSource<IEnumerable<T>>();
-
-			// Search from childValue and pick all with value
-			_dbGroupNode
-				.GetQueryOrderedByChild(childKey)
-				.GetQueryEqualToValue(new NSString(childValue))
-				//.GetQueryStartingAtValue(new NSString(childValue)) 
-				.ObserveSingleEvent(DataEventType.Value, (snapshot) =>
-				{
-					var nsObject = snapshot.ValueInExportFormat;
-					var nsDictionary = nsObject as NSDictionary;
-
-					if (nsDictionary == null)
-					{
-						t.TrySetResult(new List<T>());
-					}
-					else
-					{
-						var obj = Encoder.DecodeObject<Dictionary<string, T>>(nsDictionary);
-						var list = obj.Values.ToList();
-						var propInfo = typeof(T).GetProperty(childKey);
-						if (propInfo == null) {
-							throw new InvalidOperationException($"{typeof(T).Name} doesn't have property {childKey}");
-						}
-
-						var filteredList = list
-							.Where(o => propInfo.GetValue(o).ToString().Equals(childValue))
-							.ToList();
-						
-						t.TrySetResult(filteredList);
-					}
-				});
-
-			return t.Task;		
-		}
-
-		public Task<IEnumerable<T>> ReadPageFromNewestAsync(int pageSize, string lastIdOnPrecedingPage)
-		{
-			var t = new TaskCompletionSource<IEnumerable<T>>();
-
-			var query = _dbGroupNode.GetQueryOrderedByKey();
-			var includesPreceding = !string.IsNullOrEmpty(lastIdOnPrecedingPage);
-
-			if (includesPreceding)
-			{
-				query = query.GetQueryEndingAtValue(new NSString(lastIdOnPrecedingPage));
-				pageSize++;
-			}
-
-			query.GetQueryLimitedToLast((nuint)pageSize)
-				 .ObserveSingleEvent(DataEventType.Value, (snapshot) =>
-				 {
-					 var nsObject = snapshot.ValueInExportFormat;
-					 var nsDictionary = nsObject as NSDictionary;
-
-					 if (nsDictionary == null)
-					 {
-						 t.TrySetResult(new List<T>());
-					 }
-					 else
-					 {
-						 var list = Encoder.DecodeObject<Dictionary<string, T>>(nsDictionary).Values.ToList();
-						 var sortedFilteredList = list
-							.Where(o => string.IsNullOrWhiteSpace(lastIdOnPrecedingPage) || !o.Id.Equals(lastIdOnPrecedingPage))
-							.OrderByDescending(o => o.Id)
-							.ToList();
-
-						 t.TrySetResult(sortedFilteredList);
-					 }
-				 });
-
-			return t.Task;
-		}
-
-		public Task<bool> ExistsAsync(string id)
-		{
-			var t = new TaskCompletionSource<bool>();
-
-			_dbGroupNode.GetChild(id).ObserveSingleEvent(DataEventType.Value, (snapshot) =>
-			{
-				t.TrySetResult(snapshot.Exists);
-			});
-
-			return t.Task;
-		}
-
 		public void Delete(string id)
 		{
 			var objNode = _dbGroupNode.GetChild(id);
@@ -262,7 +145,6 @@ namespace Firebase.iOS.Providers
 
 		nuint Observe(ObservationType observationType, Action<ObservationType, T> handler)
 		{
-			var dataEventType = GetDataEventTypeFromObservationType(observationType);
 			var observerHandle = _dbGroupNode.ObserveEvent(
 				GetDataEventTypeFromObservationType(observationType),
 				(snapshot, prevKey) =>
