@@ -20,7 +20,7 @@ namespace ndcdemo
 			_messages = new ObservableCollection<Message>();
 
 			MainPage = new NavigationPage(BuildMainPage());
-			ObserveMessages();
+			ObserveServerMessages();
 		}
 
 		ContentPage BuildMainPage()
@@ -67,7 +67,7 @@ namespace ndcdemo
 			return content;
 		}
 
-		void ObserveMessages()
+		void ObserveServerMessages()
 		{
 			var dataService = ServiceContainer.DataService;
 			dataService.ObserveMessages((obsType, msg) => {

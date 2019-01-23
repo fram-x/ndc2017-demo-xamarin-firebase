@@ -9,7 +9,6 @@ namespace NdcDemo.Services
 	public interface IDataService
 	{
 		string PostMessage(Message message);
-		Task<IEnumerable<Message>> GetMessagesAsync();
 		IObservableHandle ObserveMessages(Action<ObservationType, Message> callback);
 		void CancelObservation(IObservableHandle observableHandle);
 	}

@@ -29,6 +29,5 @@ namespace NdcDemo.Services.Providers
 		Task<IEnumerable<T>> ReadAllAsync();
 
 		void Observe(Action<ObservationType, T> handler);
-		void ObserveAfterId(string afterId, Action<ObservationType, T> handler);
 	}
 }

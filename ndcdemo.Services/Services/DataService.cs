@@ -29,13 +29,6 @@ namespace NdcDemo.Services
 			return messageId;
 		}
 
-		public Task<IEnumerable<Message>> GetMessagesAsync()
-		{
-			var path = PathMessages;
-			var provider = _dataProviderFactory.GetProvider<Message>(path);
-			return provider.ReadAllAsync();
-		}
-
 		public IObservableHandle ObserveMessages(Action<ObservationType, Message> callback)
 		{
 			var path = PathMessages;
